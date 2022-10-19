@@ -68,7 +68,7 @@ plot(simulateResiduals(fit.ms4a4a))
 # flip contrast and convert to fold change
 confint.ms4a4a = as_tibble(confint(em.ms4a4a)$contrasts) %>%
       mutate(contrast = "TT - CC") %>%
-      mutate(across(c(-contrast, - treatment), ~ 2^(.x)))
+      mutate(across(c(-contrast, - treatment, -df), ~ 2^(.x)))
 
 confint.ms4a4a
 ```
