@@ -39,9 +39,9 @@ df
 
 ```{r}
 df %>%
-  ggplot(aes(x = gene, y = log2.gxp, color = gene)) +
+  ggplot(aes(x = gene, y = log2.gxp, color = gene, shape = genotype)) +
   geom_point(stat = "identity") +
-  theme(axis.text.x = element_text(angle = 45, size = rel(0.5))) +
+  theme(axis.text.x = element_blank()) + # theme(axis.text.x = element_text(angle = 45, size = rel(0.5))) +
   facet_wrap(~ line + experiment + treatment)
 ```
 
