@@ -19,7 +19,7 @@ theme_set(theme_minimal())
 ```
 
 ```{r}
-df = read_csv("iMGL_iso_samples_combined_qPCR_clean.csv") %>% clean_names()
+df = read_csv("iMGL_iso_samples_combined_qPCR_clean.csv", show_col_types = FALSE) %>% clean_names()
 
 df
 ```
