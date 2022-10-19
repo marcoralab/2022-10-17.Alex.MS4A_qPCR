@@ -35,7 +35,10 @@ summary(fit.ms4a4a)
 ```
 
 ```{r}
-(confint.ms4a4a = as_tibble(confint(em.ms4a4a)$contrasts) %>% mutate(across(c(-contrast, - treatment), ~ 2^(.x))))
+# flip contrast and convert to fold change
+(confint.ms4a4a = as_tibble(confint(em.ms4a4a)$contrasts) %>%
+    mutate(contrast = "TT - CC") %>%
+    mutate(across(c(-contrast, - treatment), ~ 2^(.x))))
 ```
 
 ```{r}
