@@ -1,5 +1,8 @@
 ---
 title: "2022-10-17 Alex MS4A qPCR"
+format: 
+   html:
+     df-print: paged
 ---
 
 ```{r}
@@ -12,22 +15,48 @@ library(broom.mixed)
 library(lmerTest)
 library(DHARMa)
 library(emmeans)
+theme_set(theme_minimal())
 ```
 
 ```{r}
 df = read_csv("iMGL_iso_samples_combined_qPCR_clean.csv") %>% clean_names()
+
 df
 ```
 
 ```{r}
-df.ms4a4a = df %>%
-  filter(target_name == "MS4A4A") %>%
+df %<>%
   mutate(genotype = fct_relevel(genotype, "CC"),
-         treatment = fct_relevel(treatment, "Basal"))
+         treatment = fct_relevel(treatment, "Basal"),
+         experiment = factor(experiment),
+         line = factor(line),
+         cell_type = factor(cell_type),
+         log2.gxp = max(avg_ct) - avg_ct) %>%
+  rename(gene = target_name)
+  
+df
+```
 
-fit.ms4a4a = lmer(d_ct ~ 1 + genotype*treatment + (1 | line/experiment), data = df.ms4a4a)
+```{r}
+df %>%
+  ggplot(aes(x = gene, y = log2.gxp, color = gene)) +
+  geom_point(stat = "identity") +
+  theme(axis.text.x = element_text(angle = 45, size = rel(0.5))) +
+  facet_wrap(~ line + experiment + treatment)
+```
+
+```{r}
+df.ms4a4a = df %>%
+  filter(gene == "MS4A4A")
+
+fit.ms4a4a = lmer(d_ct ~ 1 + genotype*treatment + (1 | line), data = df.ms4a4a)
 
 summary(fit.ms4a4a)
+```
+
+```{r}
+# |warning: FALSE
+plot(simulateResiduals(fit.ms4a4a))
 ```
 
 ```{r}
@@ -36,18 +65,29 @@ summary(fit.ms4a4a)
 
 ```{r}
 # flip contrast and convert to fold change
-(confint.ms4a4a = as_tibble(confint(em.ms4a4a)$contrasts) %>%
-    mutate(contrast = "TT - CC") %>%
-    mutate(across(c(-contrast, - treatment), ~ 2^(.x))))
+confint.ms4a4a = as_tibble(confint(em.ms4a4a)$contrasts) %>%
+      mutate(contrast = "TT - CC") %>%
+      mutate(across(c(-contrast, - treatment), ~ 2^(.x)))
+
+confint.ms4a4a
+```
+
+```{r}
+confint.ms4a4a %<>%
+  left_join(as_tibble(em.ms4a4a$contrasts) %>%
+              select(treatment, p.value),
+            by = "treatment")
+
+confint.ms4a4a
 ```
 
 ```{r}
 confint.ms4a4a %>%
-  ggplot(aes(x=treatment, y=estimate)) +
+  ggplot(aes(x = treatment, y = estimate)) +
   geom_point(stat="identity") +
   geom_errorbar(aes(ymin=lower.CL, ymax=upper.CL), width=.2) +
+  geom_text(aes(y = upper.CL, label = ifelse(p.value < 0.001, "***", ifelse(p.value < 0.01, "**", ifelse(p.value < 0.05, "*", "")))), vjust = -0.5) +
   ylim(0, 8) +
-  ylab("FC (TT - CC)") +
-  ggtitle("MS4A4A") +
-  theme_minimal()
+  ylab("Fold change (TT - CC)") +
+  ggtitle("MS4A4A")
 ```
