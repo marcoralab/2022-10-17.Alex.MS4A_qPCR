@@ -85,8 +85,8 @@ confint.ms4a4a
 ```{r}
 confint.ms4a4a %>%
   ggplot(aes(x = treatment, y = estimate)) +
-  geom_point(stat="identity") +
-  geom_errorbar(aes(ymin=lower.CL, ymax=upper.CL), width=.1) +
+  geom_point(stat = "identity") +
+  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = .1) +
   geom_text(aes(y = upper.CL, label = ifelse(p.value < 0.001, "***", ifelse(p.value < 0.01, "**", ifelse(p.value < 0.05, "*", "")))), vjust = -0.5) +
   ylim(0, 8) +
   ylab("fold.change(gxp) [TT - CC]") +
