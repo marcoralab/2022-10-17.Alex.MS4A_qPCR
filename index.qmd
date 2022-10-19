@@ -1,0 +1,49 @@
+---
+title: "qpcrmix"
+---
+
+```{r}
+library(tidyverse)
+library(magrittr)
+library(readxl)
+library(janitor)
+library(broom.mixed)
+library(lmerTest)
+library(DHARMa)
+library(emmeans)
+```
+
+```{r}
+df = read_csv("iMGL_iso_samples_combined_qPCR_clean.csv") %>% clean_names()
+df
+```
+
+```{r}
+df.ms4a4a = df %>%
+  filter(target_name == "MS4A4A") %>%
+  mutate(genotype = fct_relevel(genotype, "CC"),
+         treatment = fct_relevel(treatment, "Basal"))
+
+fit.ms4a4a = lmer(d_ct ~ 1 + genotype*treatment + (1 | line/experiment), data = df.ms4a4a)
+
+summary(fit.ms4a4a)
+```
+
+```{r}
+(em.ms4a4a = emmeans(fit.ms4a4a, pairwise ~ genotype | treatment))
+```
+
+```{r}
+(confint.ms4a4a = as_tibble(confint(em.ms4a4a)$contrasts) %>% mutate(across(c(-contrast, - treatment), ~ 2^(.x))))
+```
+
+```{r}
+confint.ms4a4a %>%
+  ggplot(aes(x=treatment, y=estimate)) +
+  geom_point(stat="identity") +
+  geom_errorbar(aes(ymin=lower.CL, ymax=upper.CL), width=.2) +
+  ylim(0, 8) +
+  ylab("FC (TT - CC)") +
+  ggtitle("MS4A4A") +
+  theme_minimal()
+```
