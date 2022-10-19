@@ -56,7 +56,7 @@ summary(fit.ms4a4a)
 ```
 
 ```{r}
-# |warning: FALSE
+#| warning: FALSE
 plot(simulateResiduals(fit.ms4a4a))
 ```
 
