@@ -181,48 +181,48 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df.ms4a4a <span class="ot">=</span> df <span class="sc">%&gt;%</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(gene <span class="sc">==</span> <span class="st">"MS4A4A"</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>fit.ms4a4a <span class="ot">=</span> <span class="fu">lmer</span>(d_ct <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> genotype<span class="sc">*</span>treatment <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> line), <span class="at">data =</span> df.ms4a4a)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit.ms4a4a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df.ms4a4a <span class="ot">=</span> df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(gene <span class="sc">==</span> <span class="st">"MS4A4A"</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>fit.ms4a4a <span class="ot">=</span> <span class="fu">lmer</span>(d_ct <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> genotype<span class="sc">*</span>treatment <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> line<span class="sc">/</span>experiment), <span class="at">data =</span> df.ms4a4a)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit.ms4a4a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
 lmerModLmerTest]
-Formula: d_ct ~ 1 + genotype * treatment + (1 | line)
+Formula: d_ct ~ 1 + genotype * treatment + (1 | line/experiment)
    Data: df.ms4a4a
 
 REML criterion at convergence: 35.7
 
 Scaled residuals: 
    Min     1Q Median     3Q    Max 
--1.843 -0.391 -0.117  0.484  1.766 
+-1.838 -0.390 -0.118  0.481  1.756 
 
 Random effects:
- Groups   Name        Variance Std.Dev.
- line     (Intercept) 0.053    0.230   
- Residual             0.200    0.448   
-Number of obs: 28, groups:  line, 2
+ Groups          Name        Variance Std.Dev.
+ experiment:line (Intercept) 0.0011   0.0332  
+ line            (Intercept) 0.0528   0.2298  
+ Residual                    0.1993   0.4464  
+Number of obs: 28, groups:  experiment:line, 10; line, 2
 
 Fixed effects:
                          Estimate Std. Error     df t value  Pr(&gt;|t|)    
-(Intercept)                -1.543      0.216  1.619   -7.15    0.0325 *  
-genotypeTT                 -0.606      0.200 21.000   -3.03    0.0064 ** 
-treatmentIFNg               2.280      0.357 21.715    6.39 0.0000021 ***
-treatmentLPS                0.859      0.357 21.715    2.41    0.0251 *  
-genotypeTT:treatmentIFNg   -1.061      0.490 21.000   -2.16    0.0422 *  
-genotypeTT:treatmentLPS    -1.205      0.490 21.000   -2.46    0.0228 *  
+(Intercept)                -1.543      0.216  1.614   -7.16    0.0326 *  
+genotypeTT                 -0.606      0.200 16.813   -3.04    0.0075 ** 
+treatmentIFNg               2.279      0.357 20.460    6.39 0.0000028 ***
+treatmentLPS                0.858      0.357 20.460    2.40    0.0258 *  
+genotypeTT:treatmentIFNg   -1.061      0.489 16.813   -2.17    0.0447 *  
+genotypeTT:treatmentLPS    -1.205      0.489 16.813   -2.46    0.0249 *  
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 Correlation of Fixed Effects:
             (Intr) gntyTT trtIFN trtLPS gTT:IF
-genotypeTT  -0.464                            
-tretmntIFNg -0.260  0.280                     
-treatmntLPS -0.260  0.280  0.214              
-gntypTT:IFN  0.189 -0.408 -0.687 -0.114       
-gntypTT:LPS  0.189 -0.408 -0.114 -0.687  0.167</code></pre>
+genotypeTT  -0.463                            
+tretmntIFNg -0.259  0.280                     
+treatmntLPS -0.259  0.280  0.216              
+gntypTT:IFN  0.189 -0.408 -0.686 -0.114       
+gntypTT:LPS  0.189 -0.408 -0.114 -0.686  0.167</code></pre>
 </div>
 </div>
 <div class="cell">
@@ -237,34 +237,34 @@ gntypTT:LPS  0.189 -0.408 -0.114 -0.687  0.167</code></pre>
 <pre><code>$emmeans
 treatment = Basal:
  genotype emmean    SE   df lower.CL upper.CL
- CC       -1.543 0.216 1.62   -2.716  -0.3706
- TT       -2.149 0.216 1.62   -3.322  -0.9770
+ CC       -1.543 0.215 1.61   -2.720   -0.366
+ TT       -2.149 0.215 1.61   -3.327   -0.972
 
 treatment = IFNg:
  genotype emmean    SE   df lower.CL upper.CL
- CC        0.737 0.381 9.12   -0.124   1.5979
- TT       -0.930 0.381 9.12   -1.791  -0.0694
+ CC        0.736 0.395 9.02   -0.158    1.629
+ TT       -0.932 0.395 9.02   -1.826   -0.038
 
 treatment = LPS:
  genotype emmean    SE   df lower.CL upper.CL
- CC       -0.684 0.381 9.12   -1.545   0.1769
- TT       -2.495 0.381 9.12   -3.356  -1.6341
+ CC       -0.685 0.395 9.02   -1.579    0.208
+ TT       -2.497 0.395 9.02   -3.390   -1.603
 
 Degrees-of-freedom method: kenward-roger 
 Confidence level used: 0.95 
 
 $contrasts
 treatment = Basal:
- contrast estimate    SE df t.ratio p.value
- CC - TT     0.606 0.200 21   3.029  0.0064
+ contrast estimate    SE   df t.ratio p.value
+ CC - TT     0.606 0.200 14.7   3.037  0.0085
 
 treatment = IFNg:
- contrast estimate    SE df t.ratio p.value
- CC - TT     1.667 0.448 21   3.725  0.0013
+ contrast estimate    SE   df t.ratio p.value
+ CC - TT     1.667 0.446 14.7   3.734  0.0021
 
 treatment = LPS:
- contrast estimate    SE df t.ratio p.value
- CC - TT     1.811 0.448 21   4.046  0.0006
+ contrast estimate    SE   df t.ratio p.value
+ CC - TT     1.811 0.446 14.7   4.056  0.0011
 
 Degrees-of-freedom method: kenward-roger </code></pre>
 </div>
@@ -280,7 +280,7 @@ Degrees-of-freedom method: kenward-roger </code></pre>
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["contrast"],"name":[1],"type":["chr"],"align":["left"]},{"label":["treatment"],"name":[2],"type":["fct"],"align":["left"]},{"label":["estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["lower.CL"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["upper.CL"],"name":[7],"type":["dbl"],"align":["right"]}],"data":[{"1":"TT - CC","2":"Basal","3":"1.522","4":"1.149","5":"21","6":"1.141","7":"2.032"},{"1":"TT - CC","2":"IFNg","3":"3.176","4":"1.364","5":"21","6":"1.666","7":"6.055"},{"1":"TT - CC","2":"LPS","3":"3.509","4":"1.364","5":"21","6":"1.841","7":"6.689"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["contrast"],"name":[1],"type":["chr"],"align":["left"]},{"label":["treatment"],"name":[2],"type":["fct"],"align":["left"]},{"label":["estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["lower.CL"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["upper.CL"],"name":[7],"type":["dbl"],"align":["right"]}],"data":[{"1":"TT - CC","2":"Basal","3":"1.522","4":"1.148","5":"14.68","6":"1.133","7":"2.046"},{"1":"TT - CC","2":"IFNg","3":"3.176","4":"1.363","5":"14.68","6":"1.640","7":"6.150"},{"1":"TT - CC","2":"LPS","3":"3.509","4":"1.363","5":"14.68","6":"1.812","7":"6.795"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -296,7 +296,7 @@ Degrees-of-freedom method: kenward-roger </code></pre>
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["contrast"],"name":[1],"type":["chr"],"align":["left"]},{"label":["treatment"],"name":[2],"type":["fct"],"align":["left"]},{"label":["estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["lower.CL"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["upper.CL"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"TT - CC","2":"Basal","3":"1.522","4":"1.149","5":"21","6":"1.141","7":"2.032","8":"0.0063832"},{"1":"TT - CC","2":"IFNg","3":"3.176","4":"1.364","5":"21","6":"1.666","7":"6.055","8":"0.0012525"},{"1":"TT - CC","2":"LPS","3":"3.509","4":"1.364","5":"21","6":"1.841","7":"6.689","8":"0.0005824"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["contrast"],"name":[1],"type":["chr"],"align":["left"]},{"label":["treatment"],"name":[2],"type":["fct"],"align":["left"]},{"label":["estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["lower.CL"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["upper.CL"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"TT - CC","2":"Basal","3":"1.522","4":"1.148","5":"14.68","6":"1.133","7":"2.046","8":"0.008489"},{"1":"TT - CC","2":"IFNg","3":"3.176","4":"1.363","5":"14.68","6":"1.640","7":"6.150","8":"0.002061"},{"1":"TT - CC","2":"LPS","3":"3.509","4":"1.363","5":"14.68","6":"1.812","7":"6.795","8":"0.001077"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>

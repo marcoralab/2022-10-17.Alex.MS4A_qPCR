@@ -47,10 +47,9 @@ df %>%
 ```
 
 ```{r}
-df.ms4a4a = df %>%
-  filter(gene == "MS4A4A")
+df.ms4a4a = df %>% filter(gene == "MS4A4A")
 
-fit.ms4a4a = lmer(d_ct ~ 1 + genotype*treatment + (1 | line), data = df.ms4a4a)
+fit.ms4a4a = lmer(d_ct ~ 1 + genotype*treatment + (1 | line/experiment), data = df.ms4a4a)
 
 summary(fit.ms4a4a)
 ```
