@@ -232,7 +232,7 @@ gntypTT:LPS  0.189 -0.408 -0.114 -0.686  0.167</code></pre>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(<span class="at">em.ms4a4a =</span> <span class="fu">emmeans</span>(fit.ms4a4a, pairwise <span class="sc">~</span> genotype <span class="sc">|</span> treatment))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>(<span class="at">em.ms4a4a =</span> <span class="fu">emmeans</span>(fit.ms4a4a, revpairwise <span class="sc">~</span> genotype <span class="sc">|</span> treatment))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>$emmeans
 treatment = Basal:
@@ -256,15 +256,15 @@ Confidence level used: 0.95
 $contrasts
 treatment = Basal:
  contrast estimate    SE   df t.ratio p.value
- CC - TT     0.606 0.200 14.7   3.037  0.0085
+ TT - CC    -0.606 0.200 14.7  -3.037  0.0085
 
 treatment = IFNg:
  contrast estimate    SE   df t.ratio p.value
- CC - TT     1.667 0.446 14.7   3.734  0.0021
+ TT - CC    -1.667 0.446 14.7  -3.734  0.0021
 
 treatment = LPS:
  contrast estimate    SE   df t.ratio p.value
- CC - TT     1.811 0.446 14.7   4.056  0.0011
+ TT - CC    -1.811 0.446 14.7  -4.056  0.0011
 
 Degrees-of-freedom method: kenward-roger </code></pre>
 </div>
@@ -272,15 +272,14 @@ Degrees-of-freedom method: kenward-roger </code></pre>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># flip contrast and convert to fold change</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>confint.ms4a4a <span class="ot">=</span> <span class="fu">as_tibble</span>(<span class="fu">confint</span>(em.ms4a4a)<span class="sc">$</span>contrasts) <span class="sc">%&gt;%</span></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="at">contrast =</span> <span class="fu">factor</span>(<span class="st">"TT - CC"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(<span class="sc">-</span>contrast, <span class="sc">-</span> treatment, <span class="sc">-</span>df), <span class="sc">~</span> <span class="dv">2</span><span class="sc">^</span>(.x)))</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>confint.ms4a4a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(<span class="sc">-</span>contrast, <span class="sc">-</span> treatment, <span class="sc">-</span>df), <span class="sc">~</span> <span class="dv">2</span><span class="sc">^-</span>(.x)))</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>confint.ms4a4a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["contrast"],"name":[1],"type":["fct"],"align":["left"]},{"label":["treatment"],"name":[2],"type":["fct"],"align":["left"]},{"label":["estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["lower.CL"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["upper.CL"],"name":[7],"type":["dbl"],"align":["right"]}],"data":[{"1":"TT - CC","2":"Basal","3":"1.522","4":"1.148","5":"14.68","6":"1.133","7":"2.046"},{"1":"TT - CC","2":"IFNg","3":"3.176","4":"1.363","5":"14.68","6":"1.640","7":"6.150"},{"1":"TT - CC","2":"LPS","3":"3.509","4":"1.363","5":"14.68","6":"1.812","7":"6.795"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["contrast"],"name":[1],"type":["fct"],"align":["left"]},{"label":["treatment"],"name":[2],"type":["fct"],"align":["left"]},{"label":["estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["lower.CL"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["upper.CL"],"name":[7],"type":["dbl"],"align":["right"]}],"data":[{"1":"TT - CC","2":"Basal","3":"1.522","4":"0.8708","5":"14.68","6":"2.046","7":"1.133"},{"1":"TT - CC","2":"IFNg","3":"3.176","4":"0.7338","5":"14.68","6":"6.150","7":"1.640"},{"1":"TT - CC","2":"LPS","3":"3.509","4":"0.7338","5":"14.68","6":"6.795","7":"1.812"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -296,7 +295,7 @@ Degrees-of-freedom method: kenward-roger </code></pre>
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["contrast"],"name":[1],"type":["fct"],"align":["left"]},{"label":["treatment"],"name":[2],"type":["fct"],"align":["left"]},{"label":["estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["lower.CL"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["upper.CL"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"TT - CC","2":"Basal","3":"1.522","4":"1.148","5":"14.68","6":"1.133","7":"2.046","8":"0.008489"},{"1":"TT - CC","2":"IFNg","3":"3.176","4":"1.363","5":"14.68","6":"1.640","7":"6.150","8":"0.002061"},{"1":"TT - CC","2":"LPS","3":"3.509","4":"1.363","5":"14.68","6":"1.812","7":"6.795","8":"0.001077"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["contrast"],"name":[1],"type":["fct"],"align":["left"]},{"label":["treatment"],"name":[2],"type":["fct"],"align":["left"]},{"label":["estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["lower.CL"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["upper.CL"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"TT - CC","2":"Basal","3":"1.522","4":"0.8708","5":"14.68","6":"2.046","7":"1.133","8":"0.008489"},{"1":"TT - CC","2":"IFNg","3":"3.176","4":"0.7338","5":"14.68","6":"6.150","7":"1.640","8":"0.002061"},{"1":"TT - CC","2":"LPS","3":"3.509","4":"0.7338","5":"14.68","6":"6.795","7":"1.812","8":"0.001077"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -305,13 +304,166 @@ Degrees-of-freedom method: kenward-roger </code></pre>
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>confint.ms4a4a <span class="sc">%&gt;%</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> treatment, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> lower.CL, <span class="at">ymax =</span> upper.CL), <span class="at">width =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">y =</span> upper.CL, <span class="at">label =</span> <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.001</span>, <span class="st">"***"</span>, <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.01</span>, <span class="st">"**"</span>, <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>, <span class="st">"*"</span>, <span class="st">""</span>)))), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> upper.CL, <span class="at">ymax =</span> lower.CL), <span class="at">width =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">y =</span> lower.CL, <span class="at">label =</span> <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.001</span>, <span class="st">"***"</span>, <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.01</span>, <span class="st">"**"</span>, <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>, <span class="st">"*"</span>, <span class="st">""</span>)))), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">8</span>) <span class="sc">+</span></span>
-<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"fold.change(gxp) [TT - CC]"</span>) <span class="sc">+</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"fold change(gene expression) [TT - CC]"</span>) <span class="sc">+</span></span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"MS4A4A"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<hr>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>df.ms4a6a <span class="ot">=</span> df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(gene <span class="sc">==</span> <span class="st">"MS4A6A"</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>fit.ms4a6a <span class="ot">=</span> <span class="fu">lmer</span>(d_ct <span class="sc">~</span> <span class="dv">1</span> <span class="sc">+</span> genotype<span class="sc">*</span>treatment <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> line<span class="sc">/</span>experiment), <span class="at">data =</span> df.ms4a6a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>boundary (singular) fit: see help('isSingular')</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit.ms4a6a)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: d_ct ~ 1 + genotype * treatment + (1 | line/experiment)
+   Data: df.ms4a6a
+
+REML criterion at convergence: 24.5
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-2.0498 -0.4982 -0.0887  0.4591  2.2852 
+
+Random effects:
+ Groups          Name        Variance Std.Dev.
+ experiment:line (Intercept) 0.0000   0.000   
+ line            (Intercept) 0.0361   0.190   
+ Residual                    0.1195   0.346   
+Number of obs: 28, groups:  experiment:line, 10; line, 2
+
+Fixed effects:
+                         Estimate Std. Error     df t value Pr(&gt;|t|)   
+(Intercept)                -4.510      0.173  1.554  -26.03   0.0049 **
+genotypeTT                 -0.300      0.155 21.000   -1.94   0.0661 . 
+treatmentIFNg               0.221      0.276 21.663    0.80   0.4321   
+treatmentLPS                0.757      0.276 21.663    2.74   0.0120 * 
+genotypeTT:treatmentIFNg   -0.358      0.379 21.000   -0.95   0.3552   
+genotypeTT:treatmentLPS    -0.761      0.379 21.000   -2.01   0.0575 . 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Correlation of Fixed Effects:
+            (Intr) gntyTT trtIFN trtLPS gTT:IF
+genotypeTT  -0.446                            
+tretmntIFNg -0.250  0.280                     
+treatmntLPS -0.250  0.280  0.216              
+gntypTT:IFN  0.182 -0.408 -0.686 -0.114       
+gntypTT:LPS  0.182 -0.408 -0.114 -0.686  0.167
+optimizer (nloptwrap) convergence code: 0 (OK)
+boundary (singular) fit: see help('isSingular')</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="fu">simulateResiduals</span>(fit.ms4a6a))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>(<span class="at">em.ms4a6a =</span> <span class="fu">emmeans</span>(fit.ms4a6a, revpairwise <span class="sc">~</span> genotype <span class="sc">|</span> treatment))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$emmeans
+treatment = Basal:
+ genotype emmean    SE   df lower.CL upper.CL
+ CC        -4.51 0.173 1.55    -5.50    -3.52
+ TT        -4.81 0.173 1.55    -5.80    -3.81
+
+treatment = IFNg:
+ genotype emmean    SE   df lower.CL upper.CL
+ CC        -4.29 0.308 8.34    -5.00    -3.58
+ TT        -4.95 0.308 8.34    -5.65    -4.24
+
+treatment = LPS:
+ genotype emmean    SE   df lower.CL upper.CL
+ CC        -3.75 0.308 8.34    -4.46    -3.05
+ TT        -4.81 0.308 8.34    -5.52    -4.11
+
+Degrees-of-freedom method: kenward-roger 
+Confidence level used: 0.95 
+
+$contrasts
+treatment = Basal:
+ contrast estimate    SE   df t.ratio p.value
+ TT - CC    -0.300 0.155 14.8  -1.939  0.0719
+
+treatment = IFNg:
+ contrast estimate    SE   df t.ratio p.value
+ TT - CC    -0.658 0.346 14.8  -1.903  0.0768
+
+treatment = LPS:
+ contrast estimate    SE   df t.ratio p.value
+ TT - CC    -1.061 0.346 14.8  -3.069  0.0079
+
+Degrees-of-freedom method: kenward-roger </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># flip contrast and convert to fold change</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>confint.ms4a6a <span class="ot">=</span> <span class="fu">as_tibble</span>(<span class="fu">confint</span>(em.ms4a6a)<span class="sc">$</span>contrasts) <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>      <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(<span class="sc">-</span>contrast, <span class="sc">-</span> treatment, <span class="sc">-</span>df), <span class="sc">~</span> <span class="dv">2</span><span class="sc">^-</span>(.x)))</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>confint.ms4a6a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["contrast"],"name":[1],"type":["fct"],"align":["left"]},{"label":["treatment"],"name":[2],"type":["fct"],"align":["left"]},{"label":["estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["lower.CL"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["upper.CL"],"name":[7],"type":["dbl"],"align":["right"]}],"data":[{"1":"TT - CC","2":"Basal","3":"1.231","4":"0.8984","5":"14.75","6":"1.547","7":"0.9792"},{"1":"TT - CC","2":"IFNg","3":"1.578","4":"0.7869","5":"14.75","6":"2.631","7":"0.9460"},{"1":"TT - CC","2":"LPS","3":"2.086","4":"0.7869","5":"14.75","6":"3.479","7":"1.2508"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>confint.ms4a6a <span class="sc">%&lt;&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="fu">as_tibble</span>(em.ms4a6a<span class="sc">$</span>contrasts) <span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>              <span class="fu">select</span>(treatment, p.value),</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>            <span class="at">by =</span> <span class="st">"treatment"</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>confint.ms4a6a</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["contrast"],"name":[1],"type":["fct"],"align":["left"]},{"label":["treatment"],"name":[2],"type":["fct"],"align":["left"]},{"label":["estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["SE"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["lower.CL"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["upper.CL"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"TT - CC","2":"Basal","3":"1.231","4":"0.8984","5":"14.75","6":"1.547","7":"0.9792","8":"0.071899"},{"1":"TT - CC","2":"IFNg","3":"1.578","4":"0.7869","5":"14.75","6":"2.631","7":"0.9460","8":"0.076769"},{"1":"TT - CC","2":"LPS","3":"2.086","4":"0.7869","5":"14.75","6":"3.479","7":"1.2508","8":"0.007926"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>confint.ms4a6a <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> treatment, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> upper.CL, <span class="at">ymax =</span> lower.CL), <span class="at">width =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">y =</span> lower.CL, <span class="at">label =</span> <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.001</span>, <span class="st">"***"</span>, <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.01</span>, <span class="st">"**"</span>, <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>, <span class="st">"*"</span>, <span class="st">""</span>)))), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"fold change(gene expression) [TT - CC]"</span>) <span class="sc">+</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"MS4A6A"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<hr>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rbind</span>(confint.ms4a4a <span class="sc">%&gt;%</span> <span class="fu">filter</span>(treatment <span class="sc">==</span> <span class="st">"Basal"</span>) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">gene =</span> <span class="st">"MS4A4A"</span>),</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>      confint.ms4a6a <span class="sc">%&gt;%</span> <span class="fu">filter</span>(treatment <span class="sc">==</span> <span class="st">"Basal"</span>) <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">gene =</span> <span class="st">"MS4A6A"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> gene, <span class="at">y =</span> estimate)) <span class="sc">+</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_errorbar</span>(<span class="fu">aes</span>(<span class="at">ymin =</span> upper.CL, <span class="at">ymax =</span> lower.CL), <span class="at">width =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">y =</span> lower.CL, <span class="at">label =</span> <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.001</span>, <span class="st">"***"</span>, <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.01</span>, <span class="st">"**"</span>, <span class="fu">ifelse</span>(p.value <span class="sc">&lt;</span> <span class="fl">0.05</span>, <span class="st">"*"</span>, <span class="st">""</span>)))), <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylim</span>(<span class="dv">0</span>, <span class="dv">8</span>) <span class="sc">+</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"fold change(gene expression)"</span>) <span class="sc">+</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"rs636317 genotype effect (TT - CC)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 

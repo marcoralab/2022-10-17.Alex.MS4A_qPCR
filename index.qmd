@@ -60,14 +60,13 @@ plot(simulateResiduals(fit.ms4a4a))
 ```
 
 ```{r}
-(em.ms4a4a = emmeans(fit.ms4a4a, pairwise ~ genotype | treatment))
+(em.ms4a4a = emmeans(fit.ms4a4a, revpairwise ~ genotype | treatment))
 ```
 
 ```{r}
 # flip contrast and convert to fold change
 confint.ms4a4a = as_tibble(confint(em.ms4a4a)$contrasts) %>%
-      mutate(contrast = factor("TT - CC")) %>%
-      mutate(across(c(-contrast, - treatment, -df), ~ 2^(.x)))
+      mutate(across(c(-contrast, - treatment, -df), ~ 2^-(.x)))
 
 confint.ms4a4a
 ```
@@ -85,10 +84,10 @@ confint.ms4a4a
 confint.ms4a4a %>%
   ggplot(aes(x = treatment, y = estimate)) +
   geom_point(stat = "identity") +
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = .1) +
-  geom_text(aes(y = upper.CL, label = ifelse(p.value < 0.001, "***", ifelse(p.value < 0.01, "**", ifelse(p.value < 0.05, "*", "")))), vjust = -0.5) +
+  geom_errorbar(aes(ymin = upper.CL, ymax = lower.CL), width = .1) +
+  geom_text(aes(y = lower.CL, label = ifelse(p.value < 0.001, "***", ifelse(p.value < 0.01, "**", ifelse(p.value < 0.05, "*", "")))), vjust = -0.5) +
   ylim(0, 8) +
-  ylab("fold.change(gxp) [TT - CC]") +
+  ylab("fold change(gene expression) [TT - CC]") +
   ggtitle("MS4A4A")
 ```
 
@@ -108,14 +107,13 @@ plot(simulateResiduals(fit.ms4a6a))
 ```
 
 ```{r}
-(em.ms4a6a = emmeans(fit.ms4a6a, pairwise ~ genotype | treatment))
+(em.ms4a6a = emmeans(fit.ms4a6a, revpairwise ~ genotype | treatment))
 ```
 
 ```{r}
 # flip contrast and convert to fold change
 confint.ms4a6a = as_tibble(confint(em.ms4a6a)$contrasts) %>%
-      mutate(contrast = factor("TT - CC")) %>%
-      mutate(across(c(-contrast, - treatment, -df), ~ 2^(.x)))
+      mutate(across(c(-contrast, - treatment, -df), ~ 2^-(.x)))
 
 confint.ms4a6a
 ```
@@ -133,10 +131,10 @@ confint.ms4a6a
 confint.ms4a6a %>%
   ggplot(aes(x = treatment, y = estimate)) +
   geom_point(stat = "identity") +
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = .1) +
-  geom_text(aes(y = upper.CL, label = ifelse(p.value < 0.001, "***", ifelse(p.value < 0.01, "**", ifelse(p.value < 0.05, "*", "")))), vjust = -0.5) +
+  geom_errorbar(aes(ymin = upper.CL, ymax = lower.CL), width = .1) +
+  geom_text(aes(y = lower.CL, label = ifelse(p.value < 0.001, "***", ifelse(p.value < 0.01, "**", ifelse(p.value < 0.05, "*", "")))), vjust = -0.5) +
   ylim(0, 8) +
-  ylab("fold.change(gxp) [TT - CC]") +
+  ylab("fold change(gene expression) [TT - CC]") +
   ggtitle("MS4A6A")
 ```
 
@@ -147,8 +145,8 @@ rbind(confint.ms4a4a %>% filter(treatment == "Basal") %>% mutate(gene = "MS4A4A"
       confint.ms4a6a %>% filter(treatment == "Basal") %>% mutate(gene = "MS4A6A")) %>%
   ggplot(aes(x = gene, y = estimate)) +
   geom_point(stat = "identity") +
-  geom_errorbar(aes(ymin = lower.CL, ymax = upper.CL), width = .1) +
-  geom_text(aes(y = upper.CL, label = ifelse(p.value < 0.001, "***", ifelse(p.value < 0.01, "**", ifelse(p.value < 0.05, "*", "")))), vjust = -0.5) +
+  geom_errorbar(aes(ymin = upper.CL, ymax = lower.CL), width = .1) +
+  geom_text(aes(y = lower.CL, label = ifelse(p.value < 0.001, "***", ifelse(p.value < 0.01, "**", ifelse(p.value < 0.05, "*", "")))), vjust = -0.5) +
   ylim(0, 8) +
   ylab("fold change(gene expression)") +
   ggtitle("rs636317 genotype effect (TT - CC)")
