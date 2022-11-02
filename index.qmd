@@ -26,13 +26,15 @@ df
 
 ```{r}
 df %<>%
-  mutate(genotype = fct_relevel(genotype, "CC"),
+  rename(gene = target_name) %>%
+  mutate(gene = fct_relevel(gene, "TBP"),
+         genotype = fct_relevel(genotype, "CC"),
          treatment = fct_relevel(treatment, "Basal"),
          experiment = factor(experiment),
          line = factor(line),
          cell_type = factor(cell_type),
-         log2.gxp = max(avg_ct) - avg_ct) %>%
-  rename(gene = target_name)
+         log2.gxp = max(avg_ct) - avg_ct)
+
   
 df
 ```
@@ -81,6 +83,18 @@ confint.ms4a4a
 ```
 
 ```{r}
+df %>%
+  filter(gene %in% c("MS4A4A", "TBP")) %>%
+  lmer(avg_ct ~ gene * genotype * treatment + (1 | line/experiment), data = .) %>%
+  emmeans(.,  ~ gene * genotype * treatment) %>%
+  contrast(., interaction = c("consec"), by = "treatment") %>%
+  left_join(x = tidy(.) %>% select(treatment, p.value), y = confint(.) %>% tidy, by = "treatment") %>%
+  mutate(across(c(estimate, std.error, conf.low, conf.high), ~ 2^-(.x))) %>%
+  rename(conf.l = conf.high, conf.h = conf.low) %>%
+  relocate(conf.l, conf.h, p.value, .after = last_col())
+```
+
+```{r}
 confint.ms4a4a %>%
   ggplot(aes(x = treatment, y = estimate)) +
   geom_point(stat = "identity") +
@@ -125,6 +139,18 @@ confint.ms4a6a %<>%
             by = "treatment")
 
 confint.ms4a6a
+```
+
+```{r}
+df %>%
+  filter(gene %in% c("MS4A6A", "TBP")) %>%
+  lmer(avg_ct ~ gene * genotype * treatment + (1 | line/experiment), data = .) %>%
+  emmeans(.,  ~ gene * genotype * treatment) %>%
+  contrast(., interaction = c("consec"), by = "treatment") %>%
+  left_join(x = tidy(.) %>% select(treatment, p.value), y = confint(.) %>% tidy, by = "treatment") %>%
+  mutate(across(c(estimate, std.error, conf.low, conf.high), ~ 2^-(.x))) %>%
+  rename(conf.l = conf.high, conf.h = conf.low) %>%
+  relocate(conf.l, conf.h, p.value, .after = last_col())
 ```
 
 ```{r}
