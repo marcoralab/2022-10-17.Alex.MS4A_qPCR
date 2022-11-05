@@ -5,8 +5,40 @@ format:
      df-print: paged
 ---
 
+## Background
+
+$\Delta CT = CT_{target.gene} - CT_{reference.gene}$
+
+$\Delta \Delta CT = \Delta CT_{treated.sample} - \Delta CT_{control.sample} =$
+
+$(CT_{target.gene.in.treated.sample} - CT_{reference.gene.in.treated.sample}) - (CT_{target.gene.in.control.sample} - CT_{reference.gene.in.control.sample}) =$
+
+$CT_{target.gene.in.treated.sample} - CT_{reference.gene.in.treated.sample} - CT_{target.gene.in.control.sample} + CT_{reference.gene.in.control.sample}$
+
+$2^{-\Delta \Delta CT}$ = fold change (FC) of target gene expression in a treated sample relative to a control sample, normalized to a reference gene
+
+Null hypothesis:
+
+$\Delta \Delta CT = 0$
+
+$\text{FC} = 2^{0} = 1$
+
+or
+
+$\Delta CT_{treated.sample} = \Delta CT_{control.sample}$
+
+or
+
+$CT_{target.gene.in.treated.sample} - CT_{reference.gene.in.treated.sample} = CT_{target.gene.in.control.sample} - CT_{reference.gene.in.control.sample}$
+
+The $2^{-\Delta \Delta CT}$ method (aka [Livak method](https://doi.org/10.1006/meth.2001.1262)) assumes a uniform PCR amplification efficiency of 100% across all samples
+
+<https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-7-85>
+
+## Load packages
+
 ```{r}
-#| message: FALSE
+#| output: FALSE
 library(tidyverse)
 library(magrittr)
 library(readxl)
@@ -18,6 +50,8 @@ library(emmeans)
 theme_set(theme_minimal())
 ```
 
+## Load and tidy data
+
 ```{r}
 df = read_csv("iMGL_iso_samples_combined_qPCR_clean.csv", show_col_types = FALSE) %>% clean_names()
 
@@ -26,18 +60,21 @@ df
 
 ```{r}
 df %<>%
-  rename(gene = target_name) %>%
+  rename(gene = target_name,
+         ct = avg_ct,
+         deltact = d_ct) %>%
   mutate(gene = fct_relevel(gene, "TBP"),
          genotype = fct_relevel(genotype, "CC"),
          treatment = fct_relevel(treatment, "Basal"),
          experiment = factor(experiment),
          line = factor(line),
-         cell_type = factor(cell_type),
-         log2.gxp = max(avg_ct) - avg_ct)
+         log2.gxp = max(ct) - ct) %>%
+  select(ct, deltact, line, experiment, gene, genotype, treatment, log2.gxp)
 
-  
 df
 ```
+
+## EDA
 
 ```{r}
 df %>%
@@ -48,10 +85,12 @@ df %>%
   facet_wrap(~ line + experiment + treatment)
 ```
 
+## MS4A4A
+
 ```{r}
 df.ms4a4a = df %>% filter(gene == "MS4A4A")
 
-fit.ms4a4a = lmer(d_ct ~ 1 + genotype*treatment + (1 | line/experiment), data = df.ms4a4a)
+fit.ms4a4a = lmer(deltact ~ 1 + genotype*treatment + (1 | line/experiment), data = df.ms4a4a)
 
 summary(fit.ms4a4a)
 ```
@@ -66,7 +105,6 @@ plot(simulateResiduals(fit.ms4a4a))
 ```
 
 ```{r}
-# flip contrast and convert to fold change
 confint.ms4a4a = as_tibble(confint(em.ms4a4a)$contrasts) %>%
       mutate(across(c(-contrast, - treatment, -df), ~ 2^-(.x)))
 
@@ -85,7 +123,7 @@ confint.ms4a4a
 ```{r}
 df %>%
   filter(gene %in% c("MS4A4A", "TBP")) %>%
-  lmer(avg_ct ~ gene * genotype * treatment + (1 | line/experiment), data = .) %>%
+  lmer(ct ~ gene * genotype * treatment + (1 | line/experiment), data = .) %>%
   emmeans(.,  ~ gene * genotype * treatment) %>%
   contrast(., interaction = c("consec"), by = "treatment") %>%
   left_join(x = tidy(.) %>% select(treatment, p.value), y = confint(.) %>% tidy, by = "treatment") %>%
@@ -105,12 +143,12 @@ confint.ms4a4a %>%
   ggtitle("MS4A4A")
 ```
 
-------------------------------------------------------------------------
+## MS4A6A
 
 ```{r}
 df.ms4a6a = df %>% filter(gene == "MS4A6A")
 
-fit.ms4a6a = lmer(d_ct ~ 1 + genotype*treatment + (1 | line/experiment), data = df.ms4a6a)
+fit.ms4a6a = lmer(deltact ~ 1 + genotype*treatment + (1 | line/experiment), data = df.ms4a6a)
 
 summary(fit.ms4a6a)
 ```
@@ -125,7 +163,6 @@ plot(simulateResiduals(fit.ms4a6a))
 ```
 
 ```{r}
-# flip contrast and convert to fold change
 confint.ms4a6a = as_tibble(confint(em.ms4a6a)$contrasts) %>%
       mutate(across(c(-contrast, - treatment, -df), ~ 2^-(.x)))
 
@@ -144,7 +181,7 @@ confint.ms4a6a
 ```{r}
 df %>%
   filter(gene %in% c("MS4A6A", "TBP")) %>%
-  lmer(avg_ct ~ gene * genotype * treatment + (1 | line/experiment), data = .) %>%
+  lmer(ct ~ gene * genotype * treatment + (1 | line/experiment), data = .) %>%
   emmeans(.,  ~ gene * genotype * treatment) %>%
   contrast(., interaction = c("consec"), by = "treatment") %>%
   left_join(x = tidy(.) %>% select(treatment, p.value), y = confint(.) %>% tidy, by = "treatment") %>%
@@ -164,7 +201,7 @@ confint.ms4a6a %>%
   ggtitle("MS4A6A")
 ```
 
-------------------------------------------------------------------------
+## MS4A4A and MS4A6A at baseline
 
 ```{r}
 rbind(confint.ms4a4a %>% filter(treatment == "Basal") %>% mutate(gene = "MS4A4A"),
