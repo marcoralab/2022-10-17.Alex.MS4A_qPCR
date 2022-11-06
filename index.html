@@ -154,7 +154,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lmerTest)</span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DHARMa)</span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(emmeans)</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggeffects)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(marginaleffects)</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="load-and-tidy-data" class="level2">
@@ -177,7 +179,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">gene =</span> target_name,</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">ct =</span> avg_ct,</span>
 <span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">deltact =</span> d_ct) <span class="sc">%&gt;%</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gene =</span> <span class="fu">fct_relevel</span>(gene, <span class="st">"TBP"</span>),</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gene =</span> <span class="fu">fct_relevel</span>(gene, <span class="st">"GAPDH"</span>),</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">genotype =</span> <span class="fu">fct_relevel</span>(genotype, <span class="st">"CC"</span>),</span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">treatment =</span> <span class="fu">fct_relevel</span>(treatment, <span class="st">"Basal"</span>),</span>
 <span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">experiment =</span> <span class="fu">factor</span>(experiment),</span>
@@ -333,10 +335,10 @@ Degrees-of-freedom method: kenward-roger </code></pre>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(gene <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"MS4A4A"</span>, <span class="st">"TBP"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(gene <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"MS4A4A"</span>, <span class="st">"GAPDH"</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lmer</span>(ct <span class="sc">~</span> gene <span class="sc">*</span> genotype <span class="sc">*</span> treatment <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> line<span class="sc">/</span>experiment), <span class="at">data =</span> .) <span class="sc">%&gt;%</span></span>
 <span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">emmeans</span>(.,  <span class="sc">~</span> gene <span class="sc">*</span> genotype <span class="sc">*</span> treatment) <span class="sc">%&gt;%</span></span>
-<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(., <span class="at">interaction =</span> <span class="fu">c</span>(<span class="st">"consec"</span>), <span class="at">by =</span> <span class="st">"treatment"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(., <span class="at">interaction =</span> <span class="fu">c</span>(<span class="st">"trt.vs.ctrl"</span>), <span class="at">by =</span> <span class="st">"treatment"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="at">x =</span> <span class="fu">tidy</span>(.) <span class="sc">%&gt;%</span> <span class="fu">select</span>(treatment, p.value), <span class="at">y =</span> <span class="fu">confint</span>(.) <span class="sc">%&gt;%</span> tidy, <span class="at">by =</span> <span class="st">"treatment"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(estimate, std.error, conf.low, conf.high), <span class="sc">~</span> <span class="dv">2</span><span class="sc">^-</span>(.x))) <span class="sc">%&gt;%</span></span>
 <span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">conf.l =</span> conf.high, <span class="at">conf.h =</span> conf.low) <span class="sc">%&gt;%</span></span>
@@ -345,7 +347,7 @@ Degrees-of-freedom method: kenward-roger </code></pre>
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["treatment"],"name":[1],"type":["chr"],"align":["left"]},{"label":["gene_consec"],"name":[2],"type":["chr"],"align":["left"]},{"label":["genotype_consec"],"name":[3],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["conf.l"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["conf.h"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"Basal","2":"MS4A4A - TBP","3":"TT - CC","4":"1.522","5":"0.8633","6":"35","7":"1.13","8":"2.052","9":"0.0071153"},{"1":"IFNg","2":"MS4A4A - TBP","3":"TT - CC","4":"3.176","5":"0.7198","6":"35","7":"1.63","8":"6.190","9":"0.0012345"},{"1":"LPS","2":"MS4A4A - TBP","3":"TT - CC","4":"3.509","5":"0.7198","6":"35","7":"1.80","8":"6.839","9":"0.0005258"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["treatment"],"name":[1],"type":["chr"],"align":["left"]},{"label":["gene_trt.vs.ctrl"],"name":[2],"type":["chr"],"align":["left"]},{"label":["genotype_trt.vs.ctrl"],"name":[3],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["conf.l"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["conf.h"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"Basal","2":"MS4A4A - GAPDH","3":"TT - CC","4":"1.498","5":"0.8145","6":"23.01","7":"0.9802","8":"2.290","9":"0.060824"},{"1":"IFNg","2":"MS4A4A - GAPDH","3":"TT - CC","4":"2.973","5":"0.7070","6":"23.01","7":"1.4509","8":"6.091","9":"0.004568"},{"1":"LPS","2":"MS4A4A - GAPDH","3":"TT - CC","4":"4.347","5":"0.7070","6":"23.01","7":"2.1216","8":"8.906","9":"0.000311"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -491,10 +493,10 @@ Degrees-of-freedom method: kenward-roger </code></pre>
 </div>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">%&gt;%</span></span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(gene <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"MS4A6A"</span>, <span class="st">"TBP"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(gene <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"MS4A6A"</span>, <span class="st">"GAPDH"</span>)) <span class="sc">%&gt;%</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lmer</span>(ct <span class="sc">~</span> gene <span class="sc">*</span> genotype <span class="sc">*</span> treatment <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> line<span class="sc">/</span>experiment), <span class="at">data =</span> .) <span class="sc">%&gt;%</span></span>
 <span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">emmeans</span>(.,  <span class="sc">~</span> gene <span class="sc">*</span> genotype <span class="sc">*</span> treatment) <span class="sc">%&gt;%</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(., <span class="at">interaction =</span> <span class="fu">c</span>(<span class="st">"consec"</span>), <span class="at">by =</span> <span class="st">"treatment"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">contrast</span>(., <span class="at">interaction =</span> <span class="fu">c</span>(<span class="st">"trt.vs.ctrl"</span>), <span class="at">by =</span> <span class="st">"treatment"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(<span class="at">x =</span> <span class="fu">tidy</span>(.) <span class="sc">%&gt;%</span> <span class="fu">select</span>(treatment, p.value), <span class="at">y =</span> <span class="fu">confint</span>(.) <span class="sc">%&gt;%</span> tidy, <span class="at">by =</span> <span class="st">"treatment"</span>) <span class="sc">%&gt;%</span></span>
 <span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(estimate, std.error, conf.low, conf.high), <span class="sc">~</span> <span class="dv">2</span><span class="sc">^-</span>(.x))) <span class="sc">%&gt;%</span></span>
 <span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">conf.l =</span> conf.high, <span class="at">conf.h =</span> conf.low) <span class="sc">%&gt;%</span></span>
@@ -503,7 +505,7 @@ Degrees-of-freedom method: kenward-roger </code></pre>
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["treatment"],"name":[1],"type":["chr"],"align":["left"]},{"label":["gene_consec"],"name":[2],"type":["chr"],"align":["left"]},{"label":["genotype_consec"],"name":[3],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["conf.l"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["conf.h"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"Basal","2":"MS4A6A - TBP","3":"TT - CC","4":"1.231","5":"0.8900","6":"35","7":"0.9717","8":"1.559","9":"0.083205"},{"1":"IFNg","2":"MS4A6A - TBP","3":"TT - CC","4":"1.578","5":"0.7707","6":"35","7":"0.9297","8":"2.677","9":"0.088843"},{"1":"LPS","2":"MS4A6A - TBP","3":"TT - CC","4":"2.086","5":"0.7707","6":"35","7":"1.2293","8":"3.540","9":"0.007804"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":["treatment"],"name":[1],"type":["chr"],"align":["left"]},{"label":["gene_trt.vs.ctrl"],"name":[2],"type":["chr"],"align":["left"]},{"label":["genotype_trt.vs.ctrl"],"name":[3],"type":["chr"],"align":["left"]},{"label":["estimate"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["df"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["conf.l"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["conf.h"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[9],"type":["dbl"],"align":["right"]}],"data":[{"1":"Basal","2":"MS4A6A - GAPDH","3":"TT - CC","4":"1.211","5":"0.8497","6":"23.01","7":"0.8649","8":"1.697","9":"0.25101"},{"1":"IFNg","2":"MS4A6A - GAPDH","3":"TT - CC","4":"1.477","5":"0.7593","6":"23.01","7":"0.8353","8":"2.610","9":"0.17043"},{"1":"LPS","2":"MS4A6A - GAPDH","3":"TT - CC","4":"2.584","5":"0.7593","6":"23.01","7":"1.4619","8":"4.568","9":"0.00219"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
@@ -536,6 +538,28 @@ Degrees-of-freedom method: kenward-roger </code></pre>
 <span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">"rs636317 genotype effect (TT - CC)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="index_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="ggeffects" class="level2">
+<h2 class="anchored" data-anchor-id="ggeffects">ggeffects</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>df2 <span class="ot">=</span> df <span class="sc">%&gt;%</span> <span class="fu">filter</span>(gene <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"MS4A4A"</span>, <span class="st">"GAPDH"</span>))</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>mod <span class="ot">=</span> <span class="fu">lmer</span>(ct <span class="sc">~</span> gene <span class="sc">*</span> genotype <span class="sc">*</span> treatment <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> line<span class="sc">/</span>experiment), <span class="at">data =</span> df2)</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggpredict</span>(mod, <span class="at">terms =</span> <span class="fu">c</span>(<span class="st">"gene"</span>, <span class="st">"genotype"</span>, <span class="st">"treatment"</span>)) <span class="sc">%&gt;%</span> plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">comparisons</span>(mod, <span class="at">variables =</span> <span class="fu">list</span>(<span class="at">gene =</span> <span class="st">"reference"</span>), <span class="at">by =</span> <span class="fu">c</span>(<span class="st">"genotype"</span>, <span class="st">"treatment"</span>), <span class="at">hypothesis =</span> <span class="st">"b1 = b2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["type"],"name":[1],"type":["chr"],"align":["left"]},{"label":["term"],"name":[2],"type":["chr"],"align":["left"]},{"label":["comparison"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["std.error"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["statistic"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["p.value"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["conf.low"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["conf.high"],"name":[8],"type":["dbl"],"align":["right"]}],"data":[{"1":"response","2":"b1=b2","3":"0.5834","4":"0.296","5":"1.971","6":"0.04868","7":"0.003371","8":"1.163"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 </div>
 </div>
 </section>

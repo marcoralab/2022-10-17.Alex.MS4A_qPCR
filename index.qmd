@@ -38,7 +38,7 @@ The $2^{-\Delta \Delta CT}$ method (aka [Livak method](https://doi.org/10.1006/m
 ## Load packages
 
 ```{r}
-#| output: FALSE
+#| output: false
 library(tidyverse)
 library(magrittr)
 library(readxl)
@@ -47,6 +47,8 @@ library(broom.mixed)
 library(lmerTest)
 library(DHARMa)
 library(emmeans)
+library(ggeffects)
+library(marginaleffects)
 theme_set(theme_minimal())
 ```
 
@@ -63,7 +65,7 @@ df %<>%
   rename(gene = target_name,
          ct = avg_ct,
          deltact = d_ct) %>%
-  mutate(gene = fct_relevel(gene, "TBP"),
+  mutate(gene = fct_relevel(gene, "GAPDH"),
          genotype = fct_relevel(genotype, "CC"),
          treatment = fct_relevel(treatment, "Basal"),
          experiment = factor(experiment),
@@ -122,10 +124,10 @@ confint.ms4a4a
 
 ```{r}
 df %>%
-  filter(gene %in% c("MS4A4A", "TBP")) %>%
+  filter(gene %in% c("MS4A4A", "GAPDH")) %>%
   lmer(ct ~ gene * genotype * treatment + (1 | line/experiment), data = .) %>%
   emmeans(.,  ~ gene * genotype * treatment) %>%
-  contrast(., interaction = c("consec"), by = "treatment") %>%
+  contrast(., interaction = c("trt.vs.ctrl"), by = "treatment") %>%
   left_join(x = tidy(.) %>% select(treatment, p.value), y = confint(.) %>% tidy, by = "treatment") %>%
   mutate(across(c(estimate, std.error, conf.low, conf.high), ~ 2^-(.x))) %>%
   rename(conf.l = conf.high, conf.h = conf.low) %>%
@@ -180,10 +182,10 @@ confint.ms4a6a
 
 ```{r}
 df %>%
-  filter(gene %in% c("MS4A6A", "TBP")) %>%
+  filter(gene %in% c("MS4A6A", "GAPDH")) %>%
   lmer(ct ~ gene * genotype * treatment + (1 | line/experiment), data = .) %>%
   emmeans(.,  ~ gene * genotype * treatment) %>%
-  contrast(., interaction = c("consec"), by = "treatment") %>%
+  contrast(., interaction = c("trt.vs.ctrl"), by = "treatment") %>%
   left_join(x = tidy(.) %>% select(treatment, p.value), y = confint(.) %>% tidy, by = "treatment") %>%
   mutate(across(c(estimate, std.error, conf.low, conf.high), ~ 2^-(.x))) %>%
   rename(conf.l = conf.high, conf.h = conf.low) %>%
@@ -214,4 +216,16 @@ rbind(confint.ms4a4a %>% filter(treatment == "Basal") %>% mutate(gene = "MS4A4A"
   ylab("fold change(gene expression)") +
   ggtitle("rs636317 genotype effect (TT - CC)")
   
+```
+
+## ggeffects
+
+```{r}
+df2 = df %>% filter(gene %in% c("MS4A4A", "GAPDH"))
+
+mod = lmer(ct ~ gene * genotype * treatment + (1 | line/experiment), data = df2)
+
+ggpredict(mod, terms = c("gene", "genotype", "treatment")) %>% plot
+
+comparisons(mod, variables = list(gene = "reference"), by = c("genotype", "treatment"), hypothesis = "b1 = b2")
 ```
