@@ -135,6 +135,11 @@ df %>%
 ```
 
 ```{r}
+fit.ms4a4a %>% comparisons(variables = "genotype",
+                           newdata = datagrid(treatment = "Basal"))
+```
+
+```{r}
 confint.ms4a4a %>%
   ggplot(aes(x = treatment, y = estimate)) +
   geom_point(stat = "identity") +
@@ -193,6 +198,11 @@ df %>%
 ```
 
 ```{r}
+fit.ms4a6a %>% comparisons(variables = "genotype",
+                           newdata = datagrid(treatment = "Basal"))
+```
+
+```{r}
 confint.ms4a6a %>%
   ggplot(aes(x = treatment, y = estimate)) +
   geom_point(stat = "identity") +
@@ -221,11 +231,13 @@ rbind(confint.ms4a4a %>% filter(treatment == "Basal") %>% mutate(gene = "MS4A4A"
 ## ggeffects
 
 ```{r}
-df2 = df %>% filter(gene %in% c("MS4A4A", "GAPDH"))
+df2 = df %>% filter(gene %in% c("MS4A6A", "GAPDH"))
 
 mod = lmer(ct ~ gene * genotype * treatment + (1 | line/experiment), data = df2)
 
 ggpredict(mod, terms = c("gene", "genotype", "treatment")) %>% plot
 
-comparisons(mod, variables = list(gene = "reference"), by = c("genotype", "treatment"), hypothesis = "b1 = b2")
+comparisons(mod, variables = list(gene = "reference"),
+            newdata = datagrid(treatment = c("Basal"), genotype = c("TT", "CC")),
+            hypothesis = "b1 = b2")
 ```
